@@ -38,11 +38,16 @@
                             <input type="text" name="login" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label   label class="form-label">Password :</label>
-                            <input type="password" name="pwd" class="form-control">
+                            <label class="form-label">Password:</label>
+                            <div class ="input-group"> 
+                                <input type="password" name="pwd" id="pwd" class="form-control">
+                                <span class="input-group-text" onclick="password_show_hide()">
+                                    <i class="bi bi-eye-fill" id ="show_eye"></i>
+                                    <i class="bi bi-eye-slash-fill d-none" id ="hide_eye"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="mt-3 d-flex justify-content-center">
-                            
                             <button type="submit" class="btn btn-success btn-sm me-2">Login</button>
                             <button type="reset" class="btn btn-danger btn-sm">Reset</button> 
                            
