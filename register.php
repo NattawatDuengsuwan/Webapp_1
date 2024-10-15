@@ -27,7 +27,7 @@ if (isset($_SESSION['id'])) {
         <?php
         include("nav.php");
         ?>
-
+        <hr>
         <div class="row">
             <div class="col-lg-3"></div>
             <div class="col-lg-6">
@@ -60,9 +60,20 @@ if (isset($_SESSION['id'])) {
                                 </div>
                             </div>
                             <div class="row mt-3">
-                                <label class="col-lg-3 col-form-label" >ยืนยันรหัสผ่าน: </label>
+                                <label class="col-lg-3 col-form-label">ยืนยันรหัสผ่าน: </label>
                                 <div class="col-lg-9 ">
-                                    <input type="password" name="pwdcheck" id="pwdcheck" onblur="CheckPass()" class="form-control" required >
+                                    <input type="password" name="pwdcheck" id="pwdcheck" onblur="CheckPass()" class="form-control" required>
+                                    <script>
+                                        function CheckPass() {
+
+                                            var password = document.getElementById("pwd").value;
+                                            var confirmPassword = document.getElementById("pwdcheck").value;
+                                            if (password !== confirmPassword) {
+                                                alert("รหัสผ่านทั้งสองยังไม่ตรงกัน");
+                                                document.getElementById("pwdcheck").value = "";
+                                            }
+                                        }
+                                    </script>
                                 </div>
                             </div>
                             <div class="row mt-3">
@@ -77,15 +88,15 @@ if (isset($_SESSION['id'])) {
                                 <div class="col-lg-9">
                                     <div class="form-check">
                                         <input type="radio" name="gender" value="m" id="m" class="form-check-input" required>
-                                        <label for="m" class="form-check-label">ชาย</label>
+                                        <label for="m" class="form-check-label">ชาย🙎</label>
                                     </div>
                                     <div class="form-check">
                                         <input type="radio" name="gender" value="f" id="f" class="form-check-input" required>
-                                        <label for="f" class="form-check-label">หญิง</label>
+                                        <label for="f" class="form-check-label">หญิง🙍‍♀️</label>
                                     </div>
                                     <div class="form-check">
                                         <input type="radio" name="gender" value="o" id="o" class="form-check-input" required>
-                                        <label for="o" class="form-check-label">อื่นๆ</label>
+                                        <label for="o" class="form-check-label">อื่นๆ🤷</label>
                                     </div>
                                 </div>
                             </div>
