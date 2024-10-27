@@ -24,25 +24,38 @@ session_start();
                 <?php
                 $conn = new PDO("mysql:host=localhost;dbname=webboard;charset=utf8", "root", "");
                 $sql = "SELECT post.title,post.content,user.login,post.post_date 
-            from post inner join user on (post.user_id=user.id) where post.id=$_GET[id] AND user.role != 'b' ";
-                $result = $conn->query($sql);
-                while ($row = $result->fetch()) {
+                        FROM post 
+                        INNER JOIN user ON (post.user_id=user.id) 
+                        WHERE post.id = :post_id AND user.role != 'b'";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':post_id', $_GET['id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $row = $stmt->fetch();
+
+                if ($row) {
                     echo "<div class='card border-primary'>";
                     echo "<div class='card-header bg-primary text-white'>$row[0]</div>";
                     echo "<div class='card-body'>$row[1]";
                     echo "<div class='mt-2'>$row[2] - $row[3]</div></div></div>";
+                } else {
+                    echo "<div class='alert alert-danger text-center mt-4'>ไม่สามารถเข้าถึงโพสต์นี้ได้</div>";
+                    $conn = null;
+                    exit();
                 }
-                $conn = null;
                 ?>
 
                 <?php
-                $conn = new PDO("mysql:host=localhost;dbname=webboard;charset=utf8", "root", "");
                 $sql = "SELECT comment.content,user.login,comment.post_date 
-            from comment inner join user on (comment.user_id=user.id) 
-            where comment.post_id=$_GET[id] AND user.role != 'b' order by comment.post_date ASC";
-                $result = $conn->query($sql);
+                        FROM comment 
+                        INNER JOIN user ON (comment.user_id=user.id) 
+                        WHERE comment.post_id = :post_id AND user.role != 'b' 
+                        ORDER BY comment.post_date ASC";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':post_id', $_GET['id'], PDO::PARAM_INT);
+                $stmt->execute();
                 $i = 1;
-                while ($row = $result->fetch()) {
+
+                while ($row = $stmt->fetch()) {
                     echo "<div class='card border-info mt-3'>";
                     echo "<div class='card-header bg-info text-white'>ความคิดเห็นที่ $i</div>";
                     echo "<div class='card-body'>$row[0]";
@@ -58,12 +71,10 @@ session_start();
                             แสดงความคิดเห็น</div>
                         <div class="card-body">
                             <form action="post_save.php" method="post">
-                                <input type="hidden" name="post_id"
-                                    value="<?= $_GET['id']; ?>">
+                                <input type="hidden" name="post_id" value="<?= $_GET['id']; ?>">
                                 <div class="row mb-3 justify-content-center">
                                     <div class="col-lg-10">
-                                        <textarea name="comment" rows="8"
-                                            class="form-control" required></textarea>
+                                        <textarea name="comment" rows="8" class="form-control" required></textarea>
                                     </div>
                                 </div>
                                 <div class="row">
