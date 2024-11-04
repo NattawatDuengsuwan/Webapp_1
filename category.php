@@ -1,109 +1,137 @@
 <?php
-session_start();
-if (!isset($_SESSION['id']) || $_SESSION['role'] != 'a') {
-    // ตรวจสอบว่าเป็นผู้ดูแลระบบหรือไม่
-    header("Location: index.php");
-    exit();
-}
-
-$conn = new PDO("mysql:host=localhost;dbname=webboard;charset=utf8", "root", "");
-
-// ดึงข้อมูลหมวดหมู่ทั้งหมดจากฐานข้อมูล
-$sql = "SELECT * FROM category ORDER BY id ASC";
-$categories = $conn->query($sql);
+    session_start();
+    if (!isset($_SESSION['role']) || $_SESSION['role']!='a'){
+            header("location:index.php");
+            die();      
+    }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <title>จัดการหมวดหมู่</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <title>Webboard</title>
     <script>
-        // ฟังก์ชันแจ้งเตือนก่อนการลบ
-        function confirmDelete() {
-            return confirm('คุณต้องการลบหมวดหมู่นี้จริงหรือไม่?');
+        function myFunction(){
+            let r=confirm("ต้องการจะลบจริงหรือไม่");
+            return r;
+        }
+        function edit_Func(id,name){
+            document.getElementById('cate_id').value = id;
+            document.getElementById('category').value = name;
         }
     </script>
 </head>
-
 <body>
     <div class="container">
-        <h1 style="text-align: center; color: pink;" class="mt-3">คาเฟ่ เเมวไม่ได้นอน 🐱</h1>
-        <?php include "nav.php"; ?>
+    <h1 style="text-align: center; color:pink;" class="mt-3">คาเฟ่ เเมวไม่ได้นอน 🐱</h1>
 
-        <!-- แสดงข้อความแจ้งเตือนความสำเร็จ -->
-        <?php if (isset($_GET['delete_success']) && $_GET['delete_success'] == 1): ?>
-            <div class="alert alert-success text-center" role="alert">
-                ลบหมวดหมู่เรียบร้อยแล้ว
-            </div>
-        <?php endif; ?>
-
-        <div class="mt-4">
-            <h3 class="text-center">จัดการหมวดหมู่</h3>
-            <table class="table table-bordered mt-3">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">ลำดับ</th>
-                        <th style="width: 70%;">ชื่อหมวดหมู่</th>
-                        <th style="width: 20%;">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $order = 1; ?>
-                    <?php foreach ($categories as $category): ?>
-                        <tr>
-                            <td><?php echo $order++; ?></td>
-                            <td><?php echo $category['name']; ?></td>
-                            <td>
-                                <!-- ปุ่มแก้ไขจะเรียกใช้ Modal -->
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal<?php echo $category['id']; ?>">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <!-- ปุ่มลบจะมีการแจ้งเตือนก่อนลบ -->
-                                <a href="deletecategory.php?id=<?php echo $category['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirmDelete();"><i class="bi bi-trash"></i></a>
-                            </td>
-                        </tr>
-
-                        <!-- Modal สำหรับแก้ไขหมวดหมู่ -->
-                        <div class="modal fade" id="editCategoryModal<?php echo $category['id']; ?>" tabindex="-1" aria-labelledby="editCategoryModalLabel<?php echo $category['id']; ?>" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editCategoryModalLabel<?php echo $category['id']; ?>">แก้ไขหมวดหมู่</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <form method="POST" action="category.php">
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="edit_category_name" class="form-label">ชื่อหมวดหมู่:</label>
-                                                <input type="text" id="edit_category_name" name="edit_category_name" class="form-control" value="<?php echo $category['name']; ?>" required>
-                                                <input type="hidden" name="edit_category_id" value="<?php echo $category['id']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Save changes</button>
-                                        </div>
-                                    </form>
+    <?php include "nav.php" ?>
+    <div class="mt-3 d-flex justify-content-around ">
+        <div>
+    <?php  
+    if(isset($_SESSION['Status_cate'])){
+    if($_SESSION['Status_cate'] == 'add_success'){
+        echo "<div class='alert alert-success'>
+        เพิ่มหมวดหมู่เรียบร้อยแล้ว</div>";
+    }
+    else if($_SESSION['Status_cate'] == 'edit_success'){
+        echo "<div class='alert alert-success'>
+        แก้ไขหมวดหมู่เรียบร้อยแล้ว</div>";
+    }
+    else if($_SESSION['Status_cate'] == 'delete_success'){
+        echo "<div class='alert alert-success'>
+        ลบหมวดหมู่เรียบร้อยแล้ว</div>";
+    }
+      unset($_SESSION['Status_cate']); 
+    }
+    ?>
+    <table class="table table-striped mt-3 "">
+        <tr class="text-center">
+            <th>ลำดับ</th>
+            <th class="text-center" style="width:20rem;">ชื่อหมวดหมู่</th>
+            <th class="text-center">จัดการ</th>
+        </tr>
+        <?php 
+        $conn=new PDO("mysql:host=localhost;dbname=webboard;
+        charset=utf8","root","");
+        $sql = "SELECT * FROM category";
+        $result=$conn->query($sql);
+        $i = 1; 
+        while($row = $result->fetch()){
+            echo "<tr class='text-center '>
+            <td class='pt-3'>$i</td>
+            <td class='pt-3'>$row[name]</td>
+            <td class='pt-3 pb-3'>
+            <a href=delete_category.php?id=$row[id]  class='btn btn-danger btn-sm ms-1 me-1 float-end' onclick='return myFunction()'>
+            <i class='bi bi-trash'></i></a>
+            <button type='button' onclick=edit_Func('$row[id]','$row[name]') class='btn btn-warning btn-sm me-2 float-end' data-bs-toggle='modal' 
+                    data-bs-target='#UserModal'><i class='bi bi-pencil-fill'></i></button>                    
+            </td>
+            </tr>";
+            $i += 1;
+        }
+        $conn = null;
+        ?>
+    </table>
+    <form action="edit_category.php" method="post">
+                    <input type="hidden" name="cate_id" id="cate_id">
+                    <div class="modal fade" id="UserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">แก้ไขหมวดหมู่</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">          
+                                    <div class="mb-2">
+                                        <label for="name" class="col-form-label">ชื่อหมวดหมู่:</label>
+                                        <input type="text" class="form-control" id="category" name="category" required>
+                                    </div> 
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save changes</button>
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            
-            <!-- ปุ่มเพิ่มหมวดหมู่ใหม่ -->
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                <i class="bi bi-bookmark"></i> เพิ่มหมวดหมู่ใหม่
-            </button>
-        </div>
+                    </div>
+                </form>
+
+
+    <form action="category_save.php" method="post">
+                    <input type="hidden" name="cate_id" id="cate_id">
+                    <div class="modal fade" id="UserModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">เพิ่มหมวดหมู่</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">          
+                                    <div class="mb-2">
+                                        <label for="name" class="col-form-label">ชื่อหมวดหมู่:</label>
+                                        <input type="text" class="form-control" id="category_add" name="category_add" required>
+                                    </div> 
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
     </div>
-
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    </div>
+    <div class="d-flex justify-content-center mt-2">
+    <button type="button" class="btn btn-success" data-bs-toggle='modal' data-bs-target='#UserModal2'><i class="bi bi-bookmark-plus"></i>เพิ่มหมวดหมู่ใหม่</button>
+    </div>
+    
+    </div>
+    </div>
 </body>
-
 </html>
